@@ -95,3 +95,10 @@ Temporary Items
 *.log
 
 # End of https://www.gitignore.io/api/macos,scala,intellij
+.idea/inspectionProfiles/
+project/target/scala-2.10/
+project/target/streams/compile/incCompileSetup/
+src/test/scala/
+target/scala-2.12/
+target/streams/compile/incCompileSetup/
+.idea/vcs.xml
