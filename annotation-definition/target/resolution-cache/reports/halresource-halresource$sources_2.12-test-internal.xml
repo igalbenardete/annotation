@@ -7,7 +7,7 @@
 		revision="1.0"
 		conf="test-internal"
 		confs="compile, runtime, test, provided, optional, compile-internal, runtime-internal, test-internal, plugin, sources, docs, pom, scala-tool"
-		date="20170720161151"/>
+		date="20170725113310"/>
 	<dependencies>
 		<module organisation="org.scalameta" name="scalameta_2.12">
 			<revision name="1.8.0" status="release" pubdate="20170522211823" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/scalameta/scalameta" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="11">

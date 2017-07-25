@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id="projectThatDefinesMacroAnnotations-build" external.linked.project.path="$MODULE_DIR$/../../annotation-definition/project" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" sbt.imports="SUB:DOLLARa56b774359f1a7e8d62c.annotation, SUB:DOLLARa56b774359f1a7e8d62c.projectThatDefinesMacroAnnotations, SUB:DOLLARa56b774359f1a7e8d62c.projectThatUsesMetaAnnotations, _root_.org.jetbrains.sbt.IdeaShellPlugin.autoImport._, _root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.plugins.JUnitXmlReportPlugin, _root_.sbt.plugins.Giter8TemplatePlugin, _root_.org.jetbrains.sbt.StructurePlugin, _root_.org.jetbrains.sbt.IdeaShellPlugin, sbt._, Keys._, dsl._" sbt.resolvers="$USER_HOME$/.ivy2/cache|ivy|Local cache, https://oss.sonatype.org/content/repositories/releases|maven|sonatype-releases, http://repo.typesafe.com/typesafe/releases|maven|typesafe-releases, https://etlhydra-artifactory-sandbox.imedidata.net/artifactory/all-repos-release|maven|Artifactory, https://oss.sonatype.org/content/repositories/snapshots|maven|sonatype-snapshots, https://repo1.maven.org/maven2/|maven|public" type="SBT_MODULE" version="4">
+<module external.linked.project.id="projectThatUsesMetaAnnotations-build" external.linked.project.path="$MODULE_DIR$/../../annotation-usage/project" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" sbt.imports="SUB:DOLLARa56b774359f1a7e8d62c.annotation, SUB:DOLLARa56b774359f1a7e8d62c.projectThatDefinesMacroAnnotations, SUB:DOLLARa56b774359f1a7e8d62c.projectThatUsesMetaAnnotations, _root_.org.jetbrains.sbt.IdeaShellPlugin.autoImport._, _root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.plugins.JUnitXmlReportPlugin, _root_.sbt.plugins.Giter8TemplatePlugin, _root_.org.jetbrains.sbt.StructurePlugin, _root_.org.jetbrains.sbt.IdeaShellPlugin, sbt._, Keys._, dsl._" sbt.resolvers="$USER_HOME$/.ivy2/cache|ivy|Local cache, https://oss.sonatype.org/content/repositories/releases|maven|sonatype-releases, http://repo.typesafe.com/typesafe/releases|maven|typesafe-releases, https://etlhydra-artifactory-sandbox.imedidata.net/artifactory/all-repos-release|maven|Artifactory, https://oss.sonatype.org/content/repositories/snapshots|maven|sonatype-snapshots, https://repo1.maven.org/maven2/|maven|public" type="SBT_MODULE" version="4">
   <component name="NewModuleRootManager">
-    <output url="file://$MODULE_DIR$/../../annotation-definition/project/target/idea-classes" />
-    <output-test url="file://$MODULE_DIR$/../../annotation-definition/project/target/idea-test-classes" />
+    <output url="file://$MODULE_DIR$/../../annotation-usage/project/target/idea-classes" />
+    <output-test url="file://$MODULE_DIR$/../../annotation-usage/project/target/idea-test-classes" />
     <exclude-output />
-    <content url="file://$MODULE_DIR$/../../annotation-definition/project">
-      <sourceFolder url="file://$MODULE_DIR$/../../annotation-definition/project" isTestSource="false" />
-      <excludeFolder url="file://$MODULE_DIR$/../../annotation-definition/project/project/target" />
-      <excludeFolder url="file://$MODULE_DIR$/../../annotation-definition/project/target" />
+    <content url="file://$MODULE_DIR$/../../annotation-usage/project">
+      <sourceFolder url="file://$MODULE_DIR$/../../annotation-usage/project" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../annotation-usage/project/project/target" />
+      <excludeFolder url="file://$MODULE_DIR$/../../annotation-usage/project/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

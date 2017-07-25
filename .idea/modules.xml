@@ -4,6 +4,8 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/annotation.iml" filepath="$PROJECT_DIR$/.idea/modules/annotation.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/annotation-build.iml" filepath="$PROJECT_DIR$/.idea/modules/annotation-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/annotation-projectThatUsesMetaAnnotations.iml" filepath="$PROJECT_DIR$/.idea/modules/annotation-projectThatUsesMetaAnnotations.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/annotation-usage-projectThatUsesMetaAnnotations-build.iml" filepath="$PROJECT_DIR$/.idea/modules/annotation-usage-projectThatUsesMetaAnnotations-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/projectThatDefinesMacroAnnotations.iml" filepath="$PROJECT_DIR$/.idea/modules/projectThatDefinesMacroAnnotations.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/projectThatDefinesMacroAnnotations-build.iml" filepath="$PROJECT_DIR$/.idea/modules/projectThatDefinesMacroAnnotations-build.iml" />
     </modules>

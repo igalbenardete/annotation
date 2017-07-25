@@ -29,9 +29,12 @@ lazy val projectThatDefinesMacroAnnotations = project.in(file("annotation-defini
     libraryDependencies += "org.scalameta" %% "scalameta" % "1.8.0" % Provided,
     macroAnnotationSettings)
 
-lazy val annotation = project.in(file("."))
+lazy val projectThatUsesMetaAnnotations = project.in(file("annotation-usage"))
   .settings(commonSettings)
   .settings(macroAnnotationSettings)
   .settings(
     libraryDependencies ++= circeDependencies
   ).dependsOn(projectThatDefinesMacroAnnotations)
+
+lazy val annotation = project.in(file(".")).aggregate(projectThatUsesMetaAnnotations)
+  

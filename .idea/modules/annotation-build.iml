@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id="annotation-build" external.linked.project.path="$MODULE_DIR$/../../project" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" sbt.imports="SUB:DOLLARd7d6ea19a7b5a22498bd.annotation, SUB:DOLLARd7d6ea19a7b5a22498bd.projectThatDefinesMacroAnnotations, _root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.plugins.JUnitXmlReportPlugin, _root_.sbt.plugins.Giter8TemplatePlugin, sbt._, Keys._, dsl._" sbt.resolvers="$USER_HOME$/.ivy2/cache|ivy|Local cache, https://oss.sonatype.org/content/repositories/releases|maven|sonatype-releases, http://repo.typesafe.com/typesafe/releases|maven|typesafe-releases, https://etlhydra-artifactory-sandbox.imedidata.net/artifactory/all-repos-release|maven|Artifactory, https://oss.sonatype.org/content/repositories/snapshots|maven|sonatype-snapshots, https://repo1.maven.org/maven2/|maven|public" type="SBT_MODULE" version="4">
+<module external.linked.project.id="annotation-build" external.linked.project.path="$MODULE_DIR$/../../project" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" sbt.imports="SUB:DOLLARa56b774359f1a7e8d62c.annotation, SUB:DOLLARa56b774359f1a7e8d62c.projectThatDefinesMacroAnnotations, SUB:DOLLARa56b774359f1a7e8d62c.projectThatUsesMetaAnnotations, _root_.org.jetbrains.sbt.IdeaShellPlugin.autoImport._, _root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.plugins.JUnitXmlReportPlugin, _root_.sbt.plugins.Giter8TemplatePlugin, _root_.org.jetbrains.sbt.StructurePlugin, _root_.org.jetbrains.sbt.IdeaShellPlugin, sbt._, Keys._, dsl._" sbt.resolvers="$USER_HOME$/.ivy2/cache|ivy|Local cache, http://repo.typesafe.com/typesafe/releases|maven|typesafe-releases, https://etlhydra-artifactory-sandbox.imedidata.net/artifactory/all-repos-release|maven|Artifactory, https://oss.sonatype.org/content/repositories/snapshots|maven|sonatype-snapshots, https://repo1.maven.org/maven2/|maven|public" type="SBT_MODULE" version="4">
   <component name="NewModuleRootManager">
     <output url="file://$MODULE_DIR$/../../project/target/idea-classes" />
     <output-test url="file://$MODULE_DIR$/../../project/target/idea-test-classes" />
@@ -14,6 +14,8 @@
     <orderEntry type="module-library">
       <library name="SBT: sbt-and-plugins">
         <CLASSES>
+          <root url="jar://$USER_HOME$/.ivy2/cache/scala_2.10/sbt_0.13/org.jetbrains/sbt-idea-shell/jars/sbt-idea-shell-1.2+2-3eadcace.jar!/" />
+          <root url="jar://$USER_HOME$/.ivy2/cache/scala_2.10/sbt_0.13/org.jetbrains/sbt-structure-extractor/jars/sbt-structure-extractor-7.0.0+49-9bc0cd21.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.10.6/lib/jansi.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.10.6/lib/jline.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.10.6/lib/scala-compiler.jar!/" />
