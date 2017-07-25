@@ -1,46 +1,16 @@
-/*
 import scala.annotation.StaticAnnotation
 import scala.collection.immutable.Seq
 import scala.meta._
+import _root_.io.circe.Json
+import _root_.io.circe.syntax._
 
-class HalResource extends StaticAnnotation {
+class SimpleHalResource extends StaticAnnotation {
   inline def apply(defn: Any): Any = meta {
     val q"case class $tName (..$params) extends $template {..$stats}" = defn
-    val p: Type.Name = tName
-    val k: Seq[Term.Param] = params
-    val encoderMethod =
-      q"""
-           import _root_.io.circe.Encoder
-           import scala.collection.immutable.Seq
 
-             implicit def encoder = new Encoder[$tName] {
-              import _root_.io.circe.Json
-              import _root_.io.circe.syntax._
 
-              def apply(a: ${tName.type}): Json = {
-                val (simpleFields: Seq[Term.Param], nonSimpleFields: Seq[Term.Param]) =
-                  $params.partition(field => field.decltpe.fold(false) {
-                    case _: Type.Name => true
-                    case _ => false
-                  })
+    val encoderMethod = SimpleHalResourceImpl.quasi(tName, params)
 
-                val embedded: Seq[(String, Json)] = nonSimpleFields.map(field => field.name.syntax -> field.name.value.asJson)
-                val simpleJsonFields: Seq[(String, Json)] = simpleFields.map(field => field.name.syntax -> field.name.value.asJson)
-
-                val baseSeq: Seq[(String, Json)] = Seq(
-                  "_links" -> Json.obj(
-                    "href" -> Json.obj(
-                      "self" -> Json.fromString("self_reference")
-                    )
-                  ),
-                  "_embedded" -> Json.fromFields(embedded),
-                ) ++ simpleJsonFields
-
-                val result: Seq[(String, Json)] = baseSeq ++ simpleJsonFields
-                Json.fromFields(result)
-              }
-             }
-        """
     defn match {
       // companion object exists
       case Term.Block(
@@ -60,6 +30,53 @@ class HalResource extends StaticAnnotation {
         abort("@WithApply must annotate a class.")
     }
   }
+}
+
+object SimpleHalResourceImpl {
+  def halRepresentation(tName: Type.Name, parameters: Seq[Term.Param]): Json = {
+    val simpleJsonFields: Seq[(String, Json)] = parameters.map(field => field.name.syntax -> field.name.value.asJson)
+    val baseSeq: Seq[(String, Json)] = Seq(
+      "_links" -> Json.obj(
+        "href" -> Json.obj(
+          "self" -> Json.fromString("self_reference")
+        )
+      ),
+    ) ++ simpleJsonFields
+
+    val result: Seq[(String, Json)] = baseSeq ++ simpleJsonFields
+    Json.fromFields(result)
+  }
+
+  def quasi(tName: Type.Name, parameters: Seq[Term.Param]) = {
+
+    val implicitEncoder =
+      q"""
+      import _root_.io.circe.Encoder
+
+      implicit def encoder = new Encoder[tName.type] {
+
+        import _root_.io.circe.Json
+        import _root_.io.circe.syntax._
+
+        def apply(a: tName.type): Json = {
+          val simpleJsonFields: Seq[(String, Json)] = parameters.map(field => field.name.syntax -> field.name.value.asJson)
+
+          val baseSeq: Seq[(String, Json)] = Seq(
+            "_links" -> Json.obj(
+              "href" -> Json.obj(
+                "self" -> Json.fromString("self_reference")
+              )
+            ),
+          ) ++ simpleJsonFields
+
+          val result: Seq[(String, Json)] = baseSeq ++ simpleJsonFields
+          Json.fromFields(result)
+        }
+      }
+      """
+    implicitEncoder
+  }
+}
 
 /*
   private def createApply(className: Type.Name) = {
@@ -126,7 +143,6 @@ class HalResource extends StaticAnnotation {
   }
 
 */
-}
 
 //class Class2Map extends scala.annotation.StaticAnnotation {
 //  inline def apply(defn: Any): Any = meta {
@@ -148,4 +164,4 @@ class HalResource extends StaticAnnotation {
 //        abort("@Class2Map must annotate a class.")
 //    }
 //  }
-//}*/
+//}
