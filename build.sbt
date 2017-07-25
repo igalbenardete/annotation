@@ -36,5 +36,5 @@ lazy val projectThatUsesMetaAnnotations = project.in(file("annotation-usage"))
     libraryDependencies ++= circeDependencies
   ).dependsOn(projectThatDefinesMacroAnnotations)
 
-lazy val annotation = project.in(file(".")).aggregate(projectThatUsesMetaAnnotations)
+//lazy val annotation = project.in(file(".")).aggregate(projectThatUsesMetaAnnotations)
   
