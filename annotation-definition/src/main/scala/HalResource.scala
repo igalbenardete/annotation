@@ -7,6 +7,8 @@ class HalResource extends StaticAnnotation {
     val q"case class $tName (..$params) extends $template {..$stats}" = defn
     val encoderMethod =
       q"""
+           import _root_.io.circe.Encoder
+
              implicit def encoder = new Encoder[$tName] {
               import _root_.io.circe.Json
               import _root_.io.circe.syntax._
