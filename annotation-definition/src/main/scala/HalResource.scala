@@ -12,7 +12,6 @@ class HalResource extends StaticAnnotation {
              implicit def encoder = new Encoder[$tName] {
               import _root_.io.circe.Json
               import _root_.io.circe.syntax._
-              import _root_.io.circe.Encoder
 
               def apply(a: $tName): Json = {
                 val (simpleFields: Seq[Term.Param], nonSimpleFields: Seq[Term.Param]) =
