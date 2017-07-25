@@ -1,7 +1,7 @@
 import io.circe.Json
 
 @HalResource
-case class Cost(id: Int, amount: Double) {
+case class Cost(id: Int, amount: Double) extends MdsolObject {
   def toHalJson: Json = {
     Json.fromString(
       s"""

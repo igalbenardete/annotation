@@ -1,8 +1,8 @@
 import io.circe.Json
 
 class Invoice(id: Int,
-                   status: String,
-                   cost: Cost) {
+              status: String,
+              cost: Cost) extends MdsolObject {
   def toHalJson: Json = {
     Json.fromString(
       s"""
