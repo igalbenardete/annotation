@@ -1,6 +1,7 @@
 import scala.annotation.StaticAnnotation
 import scala.collection.immutable.Seq
 import scala.meta._
+import scala.reflect.runtime._
 import _root_.io.circe.Json
 import _root_.io.circe.syntax._
 
@@ -12,6 +13,7 @@ class SimpleHalResource extends StaticAnnotation {
       case Term.Block(
       Seq(cls@Defn.Class(mods, name, typeParameters, Ctor.Primary(primaryMods, ctorName, primaryParameters), template), companion: Defn.Object)) =>
         val caseClassType: String = name.value
+        val p: Seq[Term.Param] = primaryParameters.flatten
         val fieldNames: Seq[String] = primaryParameters.flatMap(_.map(termpParameter => termpParameter.name.value))
 
         val templateStats = encoderMethod +: companion.templ.stats.getOrElse(Nil)
@@ -68,12 +70,28 @@ private def createApply(className: Type.Name) = {
      """
 }
 
+private def simpleHalConversion(params: Seq[Term.Param], fieldValues: Seq[Any]): Json = {
+  val zippedFields = params zip fieldValues
+  val embedded = zippedFields.map(zippedField => zippedField._1.name.value -> zippedField._2.toJson)
+  val baseSeq: Seq[(String, Json)] = Seq(
+    "_links" -> Json.obj(
+      "href" -> Json.obj(
+        "self" -> Json.fromString("self_reference")
+      )
+    ),
+    "_embedded" -> Json.fromFields(embedded),
+  )
+  Json.fromFields(baseSeq)
+}
+
+
 private def halConversion(params: Seq[Term.Param]): Json = {
   val (simpleFields: Seq[Term.Param], nonSimpleFields: Seq[Term.Param]) =
     params.partition(field => field.decltpe.fold(false) {
       case _: Type.Name => true
       case _ => false
     })
+
   val x = nonSimpleFields.head.name.syntax
   val embedded: Seq[(String, Json)] = nonSimpleFields.map(field => field.name.syntax -> field.name.value.asJson)
   val simpleJsonFields: Seq[(String, Json)] = simpleFields.map(field => field.name.syntax -> field.name.value.asJson)
