@@ -1,4 +1,3 @@
-/*
 import scala.annotation.StaticAnnotation
 import scala.collection.immutable.Seq
 import scala.meta._
@@ -148,4 +147,4 @@ class HalResource extends StaticAnnotation {
 //        abort("@Class2Map must annotate a class.")
 //    }
 //  }
-//}*/
+//}
