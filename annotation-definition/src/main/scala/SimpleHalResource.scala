@@ -85,7 +85,7 @@ private def simpleHalConversion(params: Seq[Term.Param], fieldValues: Seq[Any]):
   Json.fromFields(baseSeq)
 }
 
-private def parseAsJsonFromType(parameters: Seq[(Term.Param, Any)]) = {
+private def parseAsJsonFromType(parameters: Seq[(Term.Param, Any)]): Seq[(String, Json)] = {
   parameters.map {
     case (p: Term.Param, t:Some[Int]) => p.name.value -> t.get.asJson
     case (p: Term.Param, t: Some[Double]) => p.name.value -> t.get.asJson

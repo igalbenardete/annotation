@@ -2,6 +2,8 @@
 import _root_.io.circe.Json
 import _root_.io.circe.syntax._
 
+import scala.collection.immutable.Seq
+
 trait MyTrait
 
 case class MyClass(id: Int, message: String) extends MyTrait
@@ -22,9 +24,17 @@ def simpleHalConversion(params: Seq[String], fieldValues: Seq[Any]): Json = {
   Json.fromFields(baseSeq)
 }
 
+private def parseAsJsonFromType(parameters: Seq[(String, Any)]): Seq[(String, Json)] = {
+  parameters.map {
+    case (p: String, t:Some[Int]) => p -> t.get.asJson
+    case (p: String, t: Some[Double]) => p -> t.get.asJson
+    case (p: String, t: Some[String]) => p -> t.get.asJson
+    // Not sure about defualt
+  }
+}
 
 val myObject = MyClass(1, "Hello")
-val fieldNames: Seq[String] = myObject.getClass.getDeclaredFields.map(_.toString).toSeq
-val fieldValues: Seq[Any] = myObject.productIterator.toSeq
+val fieldNames = myObject.getClass.getDeclaredFields.map(_.toString).toSeq
+val fieldValues = myObject.productIterator.toSeq
 
-val myJson = simpleHalConversion(fieldNames, fieldValues)
+//val myJson = simpleHalConversion(fieldNames, fieldValues)
