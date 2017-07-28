@@ -37,14 +37,15 @@ object SimpleHalResourceImpl {
 }
 
 
-private def createApply(className: Type.Name) = {
+private def createEncoder(className: Type.Name) = {
   q"""
-       implicit def encoder = new Encoder[$className] {
+       import _root_.io.circe.Encoder
+
+       implicit def encoder = new Encoder[${className.value}] {
         import _root_.io.circe.Json
         import _root_.io.circe.syntax._
-        import _root_.io.circe.Encoder
 
-        def apply(a: $className): Json = {
+        def apply(a: ${className.value}): Json = {
           val (simpleFields: Seq[Term.Param], nonSimpleFields: Seq[Term.Param]) =
             params.partition(field => field.decltpe.fold(false) {
               case _: Type.Name => true
@@ -67,12 +68,12 @@ private def createApply(className: Type.Name) = {
           Json.fromFields(result)
         }
        }
-     """
+   """
 }
 
 private def simpleHalConversion(params: Seq[Term.Param], fieldValues: Seq[Any]): Json = {
-  val zippedFields = params zip fieldValues
-  val embedded = zippedFields.map(zippedField => zippedField._1.name.value -> zippedField._2.toJson)
+  val zippedFields: Seq[(Term.Param, Any)] = params zip fieldValues
+  val embedded = zippedFields.map(zippedField => zippedField._1.name.value -> zippedField._2.asJson)
   val baseSeq: Seq[(String, Json)] = Seq(
     "_links" -> Json.obj(
       "href" -> Json.obj(
@@ -82,6 +83,15 @@ private def simpleHalConversion(params: Seq[Term.Param], fieldValues: Seq[Any]):
     "_embedded" -> Json.fromFields(embedded),
   )
   Json.fromFields(baseSeq)
+}
+
+private def parseAsJsonFromType(parameters: Seq[(Term.Param, Any)]) = {
+  parameters.map {
+    case (p: Term.Param, t:Some[Int]) => p.name.value -> t.get.asJson
+    case (p: Term.Param, t: Some[Double]) => p.name.value -> t.get.asJson
+    case (p: Term.Param, t: Some[String]) => p.name.value -> t.get.asJson
+    // Not sure about defualt
+  }
 }
 
 

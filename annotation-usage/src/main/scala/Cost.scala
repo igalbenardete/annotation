@@ -21,15 +21,12 @@ case class Cost(id: Int,
 
 object Cost {
   implicit val encodeCost: Encoder[Cost] = new Encoder[Cost] {
-    override def apply(a: Cost): Json = {
+    final def apply(a: Cost): Json = {
       val fieldNames = a.getClass.getDeclaredFields.map(_.getName)
       val fieldValues: Seq[Any] = a.productIterator.toSeq
 
       val zipped: Array[(String, Any)] = fieldNames zip fieldValues
-      val jsonFields: Array[(String, Any)] = zipped.map(pair => pair._1 -> pair._2.toJson)
-
-      val myString = "sadasdas"
-      val j = myString.toJson
+      val jsonFields: Array[(String, Json)] = zipped.map(pair => pair._1 -> pair._2.asJson)
 
       val baseSeq: Seq[(String, Json)] = Seq(
         "_links" -> Json.obj(
@@ -37,7 +34,7 @@ object Cost {
             "self" -> Json.fromString("self_reference")
           )
         ),
-        "_embedded" -> Json.fromFields(fieldValues),
+        "_embedded" -> Json.fromFields(jsonFields),
       )
       ???
     }
