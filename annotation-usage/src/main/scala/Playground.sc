@@ -35,6 +35,6 @@ private def parseAsJsonFromType(parameters: Seq[(String, Any)]): Seq[(String, Js
 
 val myObject = MyClass(1, "Hello")
 val fieldNames = myObject.getClass.getDeclaredFields.map(_.toString).toSeq
-val fieldValues = myObject.productIterator.toSeq
+val fieldValues: scala.Seq[Any] = myObject.productIterator.toSeq
 
 //val myJson = simpleHalConversion(fieldNames, fieldValues)

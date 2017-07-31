@@ -16,9 +16,9 @@ class HalResource extends StaticAnnotation {
               import _root_.io.circe.Json
               import _root_.io.circe.syntax._
 
-              def apply(a: ${tName.type}): Json = {
+              def apply(a: ${tName}): Json = {
                 val (simpleFields: Seq[Term.Param], nonSimpleFields: Seq[Term.Param]) =
-                  $params.partition(field => field.decltpe.fold(false) {
+                  params.partition(field => field.decltpe.fold(false) {
                     case _: Type.Name => true
                     case _ => false
                   })
