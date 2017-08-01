@@ -69,19 +69,19 @@ object SimpleHalResourceImpl {
    """
   }
 
-  private def simpleHalConversion(params: Seq[Term.Param], fieldValues: Seq[Any]): Json = {
-    val zippedFields: Seq[(Term.Param, Any)] = params zip fieldValues
-    val embedded = zippedFields.map(zippedField => zippedField._1.name.value -> zippedField._2.asJson)
-    val baseSeq: Seq[(String, Json)] = Seq(
-      "_links" -> Json.obj(
-        "href" -> Json.obj(
-          "self" -> Json.fromString("self_reference")
-        )
-      ),
-      "_embedded" -> Json.fromFields(embedded),
-    )
-    Json.fromFields(baseSeq)
-  }
+//  private def simpleHalConversion(params: Seq[Term.Param], fieldValues: Seq[Any]): Json = {
+//    val zippedFields: Seq[(Term.Param, Any)] = params zip fieldValues
+//    val embedded = zippedFields.map(zippedField => zippedField._1.name.value -> zippedField._2.asJson)
+//    val baseSeq: Seq[(String, Json)] = Seq(
+//      "_links" -> Json.obj(
+//        "href" -> Json.obj(
+//          "self" -> Json.fromString("self_reference")
+//        )
+//      ),
+//      "_embedded" -> Json.fromFields(embedded),
+//    )
+//    Json.fromFields(baseSeq)
+//  }
 
   private def parseAsJsonFromType(parameters: Seq[(Term.Param, Any)]): Seq[(String, Json)] = {
     parameters.map {
@@ -93,29 +93,29 @@ object SimpleHalResourceImpl {
   }
 
 
-  private def halConversion(params: Seq[Term.Param]): Json = {
-    val (simpleFields: Seq[Term.Param], nonSimpleFields: Seq[Term.Param]) =
-      params.partition(field => field.decltpe.fold(false) {
-        case _: Type.Name => true
-        case _ => false
-      })
-
-    val x = nonSimpleFields.head.name.syntax
-    val embedded: Seq[(String, Json)] = nonSimpleFields.map(field => field.name.syntax -> field.name.value.asJson)
-    val simpleJsonFields: Seq[(String, Json)] = simpleFields.map(field => field.name.syntax -> field.name.value.asJson)
-
-    val baseSeq: Seq[(String, Json)] = Seq(
-      "_links" -> Json.obj(
-        "href" -> Json.obj(
-          "self" -> Json.fromString("self_reference")
-        )
-      ),
-      "_embedded" -> Json.fromFields(embedded),
-    ) ++ simpleJsonFields
-
-    val result: Seq[(String, Json)] = baseSeq ++ simpleJsonFields
-    Json.fromFields(result)
-  }
+//  private def halConversion(params: Seq[Term.Param]): Json = {
+//    val (simpleFields: Seq[Term.Param], nonSimpleFields: Seq[Term.Param]) =
+//      params.partition(field => field.decltpe.fold(false) {
+//        case _: Type.Name => true
+//        case _ => false
+//      })
+//
+//    val x = nonSimpleFields.head.name.syntax
+//    val embedded: Seq[(String, Json)] = nonSimpleFields.map(field => field.name.syntax -> field.name.value.asJson)
+//    val simpleJsonFields: Seq[(String, Json)] = simpleFields.map(field => field.name.syntax -> field.name.value.asJson)
+//
+//    val baseSeq: Seq[(String, Json)] = Seq(
+//      "_links" -> Json.obj(
+//        "href" -> Json.obj(
+//          "self" -> Json.fromString("self_reference")
+//        )
+//      ),
+//      "_embedded" -> Json.fromFields(embedded),
+//    ) ++ simpleJsonFields
+//
+//    val result: Seq[(String, Json)] = baseSeq ++ simpleJsonFields
+//    Json.fromFields(result)
+//  }
 
   private def isSimpleDataType(field: Term.Param): Boolean = {
     field.decltpe.fold(false) {
