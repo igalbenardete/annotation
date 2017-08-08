@@ -8,7 +8,32 @@ trait TestHalModel
 class TestHalEmbedded extends StaticAnnotation
 
 class TestHalResource extends StaticAnnotation {
+
   inline def apply(defn: Any): Any = meta {
+    def createEncoder(className: Type.Name, embedded: Seq[Term.Param], state: Seq[Term.Param]) = {
+      val embeddedParamNames = embedded.map(_.name.value)
+      val innerJson = s"""
+                         |val innerJson = Json.obj(
+                         |  ${embeddedParamNames.map { p => s""""$p" -> a.$p.asJson""" }.mkString(").deepMerge(Json.obj(").concat(")")}
+                         |)""".stripMargin.parse[Stat].get
+
+      q"""
+       import _root_.io.circe.Encoder
+
+       implicit def encoder = new Encoder[$className] {
+        import _root_.io.circe.Json
+        import _root_.io.circe.syntax._
+
+        def apply(a: $className): Json = {
+          $innerJson
+          Json.obj(
+            "_embedded" -> innerJson
+          )
+       }
+     }
+   """
+    }
+
     val (cls, companion) = defn match {
       case q"${cls: Defn.Class}; ${companion: Defn.Object}" => (cls, companion)
       case cls: Defn.Class => (cls, q"object ${Term.Name(cls.name.value)}")
@@ -16,39 +41,32 @@ class TestHalResource extends StaticAnnotation {
 
     }
 
-    val flatten = cls.ctor.paramss.flatten
-    flatten.foreach(println(_))
-    val (paramsWithAnnotation, paramsWithoutAnnotation) = flatten.partition(_.mods.map(_.syntax).contains(mod"@TestHalEmbedded".syntax))
+    val params = cls.ctor.paramss.flatten
+    val (paramsWithAnnotation, paramsWithoutAnnotation) = params.partition(_.mods.map(_.syntax).contains(mod"@TestHalEmbedded".syntax))
 
-    val className = Type.Name("Hal")
+    val newStats = createEncoder(Type.Name(cls.name.value), paramsWithAnnotation, paramsWithoutAnnotation) +: companion.templ.stats.getOrElse(Nil)
+    val newCompanion = companion.copy(templ = companion.templ.copy(stats = Some(newStats)))
 
+    //    val className = Type.Name("Hal")
 
-//    val mods = Seq.empty
-//    val name = "aasdf"
-//    val tpeopt = Type.Arg.ByName
-//    val p = param"..$mods $name: $tpeopt"
-//    Term.Param(Seq.empty[Mod], Term.Name("_embedded"), Some(Type.Arg)
+    //    val classParams = paramsWithoutAnnotation
+    //    val halResource = q"case class $className[..${cls.tparams}](..$classParams)"
 
-//    paramsWithoutAnnotation.foldLeft(Map.empty[String, Type.Param]){ (acc, curr) =>
-//      acc + (curr.)
-//    }
-    val classParams = paramsWithoutAnnotation
-    val halResource = q"case class $className[..${cls.tparams}](..$classParams)"
-
-    val newCompanion = companion.copy(
-      templ = companion.templ.copy(
-        stats = Some(companion.templ.stats.getOrElse(Nil) :+ halResource)
-    ))
-//    val paramsWithAnnotation = for {
-//      param <- cls.ctor.paramss.flatten.filter(_.mods.contains(mod"@TestHalEmbedded"))
-//
-//      modifier <- param.mods.collect()
-//      newParam <- modifier match {
-//        case mod"@TestHalEmbedded" => ???
-//      }
-//    } yield (modifier)
+    //    val newCompanion = companion.copy(
+    //      templ = companion.templ.copy(
+    //        stats = Some(companion.templ.stats.getOrElse(Nil) :+ halResource)
+    //    ))
+    //    val paramsWithAnnotation = for {
+    //      param <- cls.ctor.paramss.flatten.filter(_.mods.contains(mod"@TestHalEmbedded"))
+    //
+    //      modifier <- param.mods.collect()
+    //      newParam <- modifier match {
+    //        case mod"@TestHalEmbedded" => ???
+    //      }
+    //    } yield (modifier)
 
     q"$cls; $newCompanion"
   }
+
 
 }
