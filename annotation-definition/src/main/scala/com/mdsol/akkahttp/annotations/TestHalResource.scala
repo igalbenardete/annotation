@@ -1,20 +1,30 @@
+package com.mdsol.akkahttp.annotations
+
 import scala.annotation.StaticAnnotation
-import scala.meta._
 import scala.collection.immutable.Seq
-
-
-trait TestHalModel
-
-class TestHalEmbedded extends StaticAnnotation
+import scala.meta._
 
 class TestHalResource extends StaticAnnotation {
 
   inline def apply(defn: Any): Any = meta {
     def createEncoder(className: Type.Name, embedded: Seq[Term.Param], state: Seq[Term.Param]) = {
-      val embeddedParamNames = embedded.map(_.name.value)
+      val implicitParams = {
+        if (embedded.isEmpty){
+          ""
+        } else {
+          val embeddedParamTypes = embedded.flatMap(_.decltpe)
+            .foldLeft[Set[String]](Set.empty) { (acc, curr) => acc + curr.toString() }
+
+          val implicits = embeddedParamTypes.map(t => s"enc$t: Encoder[$t]")
+          "(implicit " + implicits.mkString(",") + ")"
+        }
+      }
+      val implicitEnc = s"implicit def encoder$implicitParams = enc".parse[Stat].get
+
       val innerSource = {
-        val j =embeddedParamNames.map{p => s""""$p" -> a.$p.asJson"""}.mkString(").deepMerge(Json.obj(")
-        if(embeddedParamNames.length > 1) j + ")" else j
+        val embeddedParamNames = embedded.map(_.name.value)
+        val j = embeddedParamNames.map { p => s""""$p" -> a.$p.asJson""" }.mkString(").deepMerge(Json.obj(")
+        if (embeddedParamNames.length > 1) j + ")" else j
       }
       val innerJson =
         s"""
@@ -26,17 +36,19 @@ class TestHalResource extends StaticAnnotation {
       q"""
        import _root_.io.circe.Encoder
 
-       implicit def encoder = new Encoder[$className] {
+       val enc = new Encoder[$className] {
         import _root_.io.circe.Json
         import _root_.io.circe.syntax._
+        import _root_.io.circe.generic.auto._
 
         def apply(a: $className): Json = {
           $innerJson
           Json.obj(
             "_embedded" -> innerJson
           )
-        }
        }
+       $implicitEnc
+     }
    """
     }
 
@@ -52,24 +64,6 @@ class TestHalResource extends StaticAnnotation {
 
     val newStats = createEncoder(Type.Name(cls.name.value), paramsWithAnnotation, paramsWithoutAnnotation) +: companion.templ.stats.getOrElse(Nil)
     val newCompanion = companion.copy(templ = companion.templ.copy(stats = Some(newStats)))
-
-    //    val className = Type.Name("Hal")
-
-    //    val classParams = paramsWithoutAnnotation
-    //    val halResource = q"case class $className[..${cls.tparams}](..$classParams)"
-
-    //    val newCompanion = companion.copy(
-    //      templ = companion.templ.copy(
-    //        stats = Some(companion.templ.stats.getOrElse(Nil) :+ halResource)
-    //    ))
-    //    val paramsWithAnnotation = for {
-    //      param <- cls.ctor.paramss.flatten.filter(_.mods.contains(mod"@TestHalEmbedded"))
-    //
-    //      modifier <- param.mods.collect()
-    //      newParam <- modifier match {
-    //        case mod"@TestHalEmbedded" => ???
-    //      }
-    //    } yield (modifier)
 
     q"$cls; $newCompanion"
   }

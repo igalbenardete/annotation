@@ -1,16 +1,30 @@
 import scala.meta._
 import scala.collection.immutable.Seq
 import _root_.io.circe.Json
+
 val s =
   source"""
     @TestHalResource
-    case class TestCost(id: String = "asd", @TestHalEmbedded testInvoice: TestInvoice, anotherInvoice: TestInvoice)
+    case class TestCost(id: String = "asd", @TestHalEmbedded testInvoice: TestInvoice, @TestHalEmbedded anotherInvoice: TestInvoice2)
   """
 def createEncoder(className: Type.Name, embedded: Seq[Term.Param], state: Seq[Term.Param]) = {
-  val embeddedParamNames = embedded.map(_.name.value)
+  val implicitParams = {
+    if (embedded.isEmpty){
+      ""
+    } else {
+      val embeddedParamTypes = embedded.flatMap(_.decltpe)
+        .foldLeft[Set[String]](Set.empty) { (acc, curr) => acc + curr.toString() }
+
+      val implicits = embeddedParamTypes.map(t => s"enc$t: Encoder[$t]")
+      "(implicit " + implicits.mkString(",") + ")"
+    }
+  }
+  val implicitEnc = s"implicit def encoder$implicitParams = enc".parse[Stat].get
+
   val innerSource = {
-    val j =embeddedParamNames.map{p => s""""$p" -> a.$p.asJson"""}.mkString(").deepMerge(Json.obj(")
-    if(embeddedParamNames.length > 1) j + ")" else j
+    val embeddedParamNames = embedded.map(_.name.value)
+    val j = embeddedParamNames.map { p => s""""$p" -> a.$p.asJson""" }.mkString(").deepMerge(Json.obj(")
+    if (embeddedParamNames.length > 1) j + ")" else j
   }
   val innerJson =
     s"""
@@ -22,9 +36,10 @@ def createEncoder(className: Type.Name, embedded: Seq[Term.Param], state: Seq[Te
   q"""
        import _root_.io.circe.Encoder
 
-       implicit def encoder = new Encoder[$className] {
+       val enc = new Encoder[$className] {
         import _root_.io.circe.Json
         import _root_.io.circe.syntax._
+        import _root_.io.circe.generic.auto._
 
         def apply(a: $className): Json = {
           $innerJson
@@ -32,6 +47,7 @@ def createEncoder(className: Type.Name, embedded: Seq[Term.Param], state: Seq[Te
             "_embedded" -> innerJson
           )
        }
+       $implicitEnc
      }
    """
 }
@@ -47,11 +63,13 @@ val (paramsWithAnnotation, paramsWithoutAnnotation) = params.partition(_.mods.ma
 val newStats = createEncoder(Type.Name(cls.name.value), paramsWithAnnotation, paramsWithoutAnnotation) +: companion.templ.stats.getOrElse(Nil)
 val newCompanion = companion.copy(templ = companion.templ.copy(stats = Some(newStats)))
 
+
+
 val embeddedParamNames = paramsWithAnnotation.map(_.name.value)
 //val innerSource = embeddedParamNames.map{p => s""""$p" -> a.$p.asJson"""}.mkString(").deepMerge(Json.obj(").concat(")")
 val innerSource = {
-  val j =embeddedParamNames.map{p => s""""$p" -> a.$p.asJson"""}.mkString(").deepMerge(Json.obj(")
-  if(embeddedParamNames.length > 1) j + ")" else j
+  val j = embeddedParamNames.map { p => s""""$p" -> a.$p.asJson""" }.mkString(").deepMerge(Json.obj(")
+  if (embeddedParamNames.length > 1) j + ")" else j
 }
 val innerJson =
   s"""
@@ -60,13 +78,27 @@ val innerJson =
      |)
    """.stripMargin.parse[Stat].get
 
+val implicitParams = {
+  if (embeddedParamNames.isEmpty) {
+    ""
+  } else {
+    val embeddedParamTypes = paramsWithAnnotation.flatMap(_.decltpe)
+      .foldLeft[Set[String]](Set.empty) { (acc, curr) => acc + curr.toString() }
 
-val qqq = q"""
+    val implicits = embeddedParamTypes.map(t => s"enc$t: Encoder[$t]")
+    "(implicit " + implicits.mkString(",") + ")"
+  }
+}
+val implicitEnc = s"implicit def encoder$implicitParams = enc".parse[Stat].get
+val qqq =
+  q"""
        import _root_.io.circe.Encoder
 
-       implicit def encoder = new Encoder[Pippo] {
+
+       val enc = new Encoder[Pippo] {
         import _root_.io.circe.Json
         import _root_.io.circe.syntax._
+
 
         def apply(a: Pippo): Json = {
           ${innerJson}
@@ -74,5 +106,6 @@ val qqq = q"""
             "_embedded" -> innerJson
           )
        }
+       $implicitEnc
      }
    """
