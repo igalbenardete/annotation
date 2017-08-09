@@ -12,10 +12,16 @@ class TestHalResource extends StaticAnnotation {
   inline def apply(defn: Any): Any = meta {
     def createEncoder(className: Type.Name, embedded: Seq[Term.Param], state: Seq[Term.Param]) = {
       val embeddedParamNames = embedded.map(_.name.value)
-      val innerJson = s"""
-                         |val innerJson = Json.obj(
-                         |  ${embeddedParamNames.map { p => s""""$p" -> a.$p.asJson""" }.mkString(").deepMerge(Json.obj(").concat(")")}
-                         |)""".stripMargin.parse[Stat].get
+      val innerSource = {
+        val j =embeddedParamNames.map{p => s""""$p" -> a.$p.asJson"""}.mkString(").deepMerge(Json.obj(")
+        if(embeddedParamNames.length > 1) j + ")" else j
+      }
+      val innerJson =
+        s"""
+           |val innerJson = Json.obj(
+           |  ${innerSource}
+           |)
+   """.stripMargin.parse[Stat].get
 
       q"""
        import _root_.io.circe.Encoder
@@ -29,8 +35,8 @@ class TestHalResource extends StaticAnnotation {
           Json.obj(
             "_embedded" -> innerJson
           )
+        }
        }
-     }
    """
     }
 

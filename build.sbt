@@ -28,6 +28,7 @@ lazy val projectThatDefinesMacroAnnotations = project.in(file("annotation-defini
     name := "HalResource",
     libraryDependencies += "org.scalameta" %% "scalameta" % "1.8.0" % Provided,
     libraryDependencies ++= circeDependencies,
+    libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % Test,
     macroAnnotationSettings)
 
 lazy val projectThatUsesMetaAnnotations = project.in(file("annotation-usage"))

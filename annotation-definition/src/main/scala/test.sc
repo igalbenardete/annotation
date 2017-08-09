@@ -4,14 +4,18 @@ import _root_.io.circe.Json
 val s =
   source"""
     @TestHalResource
-    case class TestCost(id: String = "asd", @TestHalEmbedded testInvoice: TestInvoice, @TestHalEmbedded anotherInvoice: TestInvoice)
+    case class TestCost(id: String = "asd", @TestHalEmbedded testInvoice: TestInvoice, anotherInvoice: TestInvoice)
   """
 def createEncoder(className: Type.Name, embedded: Seq[Term.Param], state: Seq[Term.Param]) = {
   val embeddedParamNames = embedded.map(_.name.value)
+  val innerSource = {
+    val j =embeddedParamNames.map{p => s""""$p" -> a.$p.asJson"""}.mkString(").deepMerge(Json.obj(")
+    if(embeddedParamNames.length > 1) j + ")" else j
+  }
   val innerJson =
     s"""
        |val innerJson = Json.obj(
-       |  ${embeddedParamNames.map{p => s""""$p" -> a.$p.asJson"""}.mkString(").deepMerge(Json.obj(").concat(")")}
+       |  ${innerSource}
        |)
    """.stripMargin.parse[Stat].get
 
@@ -45,10 +49,14 @@ val newCompanion = companion.copy(templ = companion.templ.copy(stats = Some(newS
 
 val embeddedParamNames = paramsWithAnnotation.map(_.name.value)
 //val innerSource = embeddedParamNames.map{p => s""""$p" -> a.$p.asJson"""}.mkString(").deepMerge(Json.obj(").concat(")")
+val innerSource = {
+  val j =embeddedParamNames.map{p => s""""$p" -> a.$p.asJson"""}.mkString(").deepMerge(Json.obj(")
+  if(embeddedParamNames.length > 1) j + ")" else j
+}
 val innerJson =
   s"""
      |val innerJson = Json.obj(
-     |  ${embeddedParamNames.map{p => s""""$p" -> a.$p.asJson"""}.mkString(").deepMerge(Json.obj(").concat(")")}
+     |  ${innerSource}
      |)
    """.stripMargin.parse[Stat].get
 
