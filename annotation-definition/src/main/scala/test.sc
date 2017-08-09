@@ -9,7 +9,7 @@ val s =
   """
 def createEncoder(className: Type.Name, embedded: Seq[Term.Param], state: Seq[Term.Param]) = {
   val implicitParams = {
-    if (embedded.isEmpty){
+    if (embedded.isEmpty) {
       ""
     } else {
       val embeddedParamTypes = embedded.flatMap(_.decltpe)
@@ -36,7 +36,7 @@ def createEncoder(className: Type.Name, embedded: Seq[Term.Param], state: Seq[Te
   q"""
        import _root_.io.circe.Encoder
 
-       val enc = new Encoder[$className] {
+       lazy val enc: Encoder[$className] = new Encoder[$className] {
         import _root_.io.circe.Json
         import _root_.io.circe.syntax._
         import _root_.io.circe.generic.auto._
